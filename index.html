@@ -97,16 +97,20 @@
         exclusionOptions.forEach(option => {
             const li = document.createElement('li');
 
+            const checkboxId = `exclusion-${option.label.replace(/\W+/g, '').toLowerCase()}`;
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = true;
             checkbox.value = option.value;
             checkbox.className = 'form-check-input me-2 exclusion';
+            checkbox.id = checkboxId;
             checkbox.addEventListener('change', updateOutput);
 
             const label = document.createElement('label');
             label.textContent = `Exclude ${option.label}`;
             label.className = 'form-check-label';
+            label.setAttribute('for', checkboxId);
 
             li.className = 'form-check';
             li.appendChild(checkbox);
@@ -139,16 +143,21 @@
                 const li = document.createElement('li');
                 li.className = 'form-check';
 
+                const checkboxId = `pokemon-${mon.name.replace(/\W+/g, '').toLowerCase()}`;
+
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.checked = true;
                 checkbox.value = mon.name;
                 checkbox.className = 'form-check-input pokemon';
+                checkbox.id = checkboxId;
                 checkbox.addEventListener('change', updateOutput);
 
                 const label = document.createElement('label');
                 label.className = 'form-check-label ms-2';
+                label.setAttribute('for', checkboxId);
                 label.textContent = mon.name;
+
 
                 if (mon.rarity === 'rare') {
                     const rareTag = document.createElement('span');
