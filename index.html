@@ -11,8 +11,18 @@
             font-style: italic;
             color: #6c757d;
         }
+
         textarea {
             height: 160px;
+        }
+
+        @media (max-width: 576px) {
+            #copyButton {
+                width: 100%;
+                padding: 0.5rem;
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+            }
         }
     </style>
 </head>
@@ -40,8 +50,8 @@
 
     <section class="mb-3">
         <label for="output" class="form-label">Generated Output:</label>
-        <textarea id="output" class="form-control" readonly></textarea>
-        <button class="btn btn-success mt-2" onclick="copyToClipboard()">Copy</button>
+        <textarea id="output" class="form-control mb-4" readonly></textarea>
+        <button id="copyButton" class="btn btn-success" onclick="copyToClipboard()">Copy</button>
     </section>
 
     <!-- Scripts -->
