@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pokémon Filter Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h2, h3 {
+            margin-top: 30px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+        }
+        button {
+            margin-top: 10px;
+            margin-right: 5px;
+        }
+        .habitat {
+            margin-top: 20px;
+        }
+        .rare-label {
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<h2>Pokémon Filter Tool</h2>
+
+<h3>Exclusion Options</h3>
+<div>
+    <button onclick="toggleAll('exclusion', true)">Select All</button>
+    <button onclick="toggleAll('exclusion', false)">Deselect All</button>
+</div>
+<ul id="exclusion-options"></ul>
+
+<h3>Pokémon List</h3>
+<div>
+    <button onclick="toggleAll('pokemon', true)">Select All</button>
+    <button onclick="toggleAll('pokemon', false)">Deselect All</button>
+</div>
+<div id="pokemon-lists" class="row"></div>
+
+<label for="output">Generated Output:</label>
+<textarea id="output" readonly></textarea><br>
+<button onclick="copyToClipboard()">Copy</button>
+
+<script>
+    const exclusionOptions = [
+        { label: '4*', value: '!4*' },
+        { label: 'favourite', value: '!favourite' },
+        { label: 'shiny', value: '!shiny' },
+        { label: 'XXL', value: '!xxl' },
+        { label: 'XXS', value: '!xxs' },
+        { label: 'shadow', value: '!shadow' },
+        { label: 'legendary', value: '!legendary' },
+        { label: 'mythical', value: '!mythical' },
+        { label: 'ultra beasts', value: '!ultra beasts' },
+        { label: 'tagged', value: '!#' },
+        { label: 'dynamax', value: '!dynamax' },
+        { label: 'gigantamax', value: '!gigantamax' }
+    ];
+
+    const habitats = [
+        {
+            name: "Ancient Temple",
+            common: ['Rhyhorn', 'Sableye', 'Duskull', 'Chimecho', 'Skorupi', 'Drilbur', 'Archen', 'Gothita', 'Golett', 'Rufflet', 'Phantump', 'Jangmo-o', 'Greavard'],
+            rare: ['Sandile']
+        },
+        {
+            name: "Carnival Grounds",
+            common: ['Heracross', 'Teddiursa', 'Slugma', 'Scraggy', 'Solosis', 'Vanillite', 'Frillish', 'Elgyem', 'Dewpider', 'Togedemaru', 'Cetoddle', 'Frigibax'],
+            rare: ['Turtonator']
+        },
+        {
+            name: "Noble Fields",
+            common: ["Farfetch'd", 'Dunsparce', 'Timburr', 'Karrablast', 'Shelmet', 'Pawniard', 'Flabébé', 'Skiddo', 'Fomantis', 'Skwovet', 'Wooloo', 'Falinks', 'Smoliv'],
+            rare: ['Druddigon']
+        },
+        {
+            name: "Sunken Treasure",
+            common: ['Totodile', 'Corphish', 'Finneon', 'Basculin', 'Inkay', 'Binacle', 'Skrelp', 'Clauncher', 'Carbink', 'Wimpod', 'Sandygast', 'Wiglett'],
+            rare: ['Rockruff']
+        },
+        {
+            name: "Other",
+            common: ['Hawlucha', 'Rotom', 'Unown', 'Spinda'],
+            rare: []
+        }
+    ];
+
+    const exclusionList = document.getElementById('exclusion-options');
+    const pokemonListsContainer = document.getElementById('pokemon-lists');
+    const outputTextArea = document.getElementById('output');
+
+    // Render exclusion checkboxes
+    exclusionOptions.forEach(option => {
+        const li = document.createElement('li');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = true;
+        checkbox.value = option.value;
+        checkbox.className = 'exclusion';
+        checkbox.addEventListener('change', updateOutput);
+
+        const label = document.createElement('label');
+        label.textContent = `Exclude ${option.label}`;
+        label.style.marginLeft = '5px';
+
+        li.appendChild(checkbox);
+        li.appendChild(label);
+        exclusionList.appendChild(li);
+    });
+
+    // Render Pokémon by habitat
+    habitats.forEach(habitat => {
+        const habitatDiv = document.createElement('div');
+        habitatDiv.className = 'habitat col-md-3';
+
+        const title = document.createElement('h4');
+        title.textContent = habitat.name;
+        habitatDiv.appendChild(title);
+
+        const allMons = [...habitat.common.map(p => ({ name: p, rarity: 'common' })), ...habitat.rare.map(p => ({ name: p, rarity: 'rare' }))];
+
+        const ul = document.createElement('ul');
+        allMons.forEach(mon => {
+            const li = document.createElement('li');
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = true;
+            checkbox.value = mon.name;
+            checkbox.className = 'pokemon';
+            checkbox.addEventListener('change', updateOutput);
+
+            const label = document.createElement('label');
+            label.textContent = mon.name;
+            label.style.marginLeft = '5px';
+
+            if (mon.rarity === 'rare') {
+                const rareTag = document.createElement('span');
+                rareTag.textContent = ' (Rare)';
+                rareTag.className = 'rare-label';
+                label.appendChild(rareTag);
+            }
+
+            li.appendChild(checkbox);
+            li.appendChild(label);
+            ul.appendChild(li);
+        });
+
+        habitatDiv.appendChild(ul);
+        pokemonListsContainer.appendChild(habitatDiv);
+    });
+
+    function updateOutput() {
+        const selectedExclusions = Array.from(document.querySelectorAll('.exclusion:checked'))
+                .map(cb => cb.value);
+        const selectedPokemon = Array.from(document.querySelectorAll('.pokemon:checked'))
+                .map(cb => cb.value);
+
+        const exclusionString = selectedExclusions.join('&');
+        const pokemonString = selectedPokemon.join(',');
+
+        outputTextArea.value = `${exclusionString}&${pokemonString}`;
+    }
+
+    function copyToClipboard() {
+        outputTextArea.select();
+        outputTextArea.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        alert("Copied to clipboard!");
+    }
+
+    function toggleAll(className, check) {
+        const checkboxes = document.querySelectorAll(`.${className}`);
+        checkboxes.forEach(cb => cb.checked = check);
+        updateOutput();
+    }
+
+    // Initialize output
+    updateOutput();
+</script>
+
+</body>
+</html>
