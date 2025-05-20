@@ -46,6 +46,11 @@
 
     <!-- Scripts -->
     <script>
+        const STORAGE_KEYS = {
+            exclusions: 'goFestExclusions',
+            pokemon: 'goFestPokemon'
+        };
+
         const exclusionOptions = [
             { label: '4*', value: '!4*' },
             { label: 'favourite', value: '!favourite' },
@@ -177,6 +182,28 @@
             pokemonListsContainer.appendChild(habitatDiv);
         });
 
+        function restoreSelections() {
+            const storedExclusions = localStorage.getItem(STORAGE_KEYS.exclusions);
+            const storedPokemon = localStorage.getItem(STORAGE_KEYS.pokemon);
+
+            if (storedExclusions && storedPokemon) {
+                const exclusions = JSON.parse(storedExclusions);
+                const pokemon = JSON.parse(storedPokemon);
+
+                document.querySelectorAll('.exclusion').forEach(cb => {
+                    cb.checked = exclusions.includes(cb.value);
+                });
+
+                document.querySelectorAll('.pokemon').forEach(cb => {
+                    cb.checked = pokemon.includes(cb.value);
+                });
+            } else {
+                // If no previous data, default to all checked
+                toggleAll('exclusion', true);
+                toggleAll('pokemon', true);
+            }
+        }
+
         function updateOutput() {
             const selectedExclusions = Array.from(document.querySelectorAll('.exclusion:checked'))
                 .map(cb => cb.value);
@@ -187,6 +214,10 @@
             const pokemonString = selectedPokemon.join(',');
 
             outputTextArea.value = `${exclusionString}&${pokemonString}`;
+
+            // Save selections to localStorage
+            localStorage.setItem(STORAGE_KEYS.exclusions, JSON.stringify(selectedExclusions));
+            localStorage.setItem(STORAGE_KEYS.pokemon, JSON.stringify(selectedPokemon));
         }
 
         function copyToClipboard() {
@@ -201,6 +232,10 @@
             updateOutput();
         }
 
+        // Restore saved state
+        restoreSelections();
+
+        // Initialize output
         updateOutput();
     </script>
 </body>
