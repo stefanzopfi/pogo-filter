@@ -26,6 +26,7 @@
         }
     </style>
 </head>
+
 <body class="container py-4">
 
     <h2>Pokémon Filter Tool</h2>
@@ -138,16 +139,9 @@
             const habitatDiv = document.createElement('div');
             habitatDiv.className = 'col-12 col-sm-6 col-lg-4';
 
-            const card = document.createElement('div');
-            card.className = 'card h-100';
-
-            const cardBody = document.createElement('div');
-            cardBody.className = 'card-body';
-
             const title = document.createElement('h5');
-            title.className = 'card-title';
             title.textContent = habitat.name;
-            cardBody.appendChild(title);
+            habitatDiv.appendChild(title);
 
             const allMons = [...habitat.common.map(p => ({ name: p, rarity: 'common' })), ...habitat.rare.map(p => ({ name: p, rarity: 'rare' }))];
 
@@ -186,9 +180,7 @@
                 ul.appendChild(li);
             });
 
-            cardBody.appendChild(ul);
-            card.appendChild(cardBody);
-            habitatDiv.appendChild(card);
+            habitatDiv.appendChild(ul);
             pokemonListsContainer.appendChild(habitatDiv);
         });
 
